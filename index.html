@@ -109,7 +109,7 @@ td:last-child{color:var(--g);font-weight:700}
 <div id="lockScreen" class="lock-screen">
   <div class="lock-box">
     <input id="plannerPassword" type="password" placeholder="Password" autocomplete="current-password">
-    <button type="button" onclick="unlockPlanner()">들어가기</button>
+    <button type="button" id="unlockButton">들어가기</button>
     <div id="lockError" class="lock-error"></div>
   </div>
 </div><div class="wrap">
@@ -137,18 +137,21 @@ const PLANNER_PASSWORD = "1021";
 
 const LOGIN_KEY = "commissionPlannerUnlockedV1";
 
-function unlockPlanner(){
-  const input=document.getElementById("plannerPassword");
-  const error=document.getElementById("lockError");
-  if(input.value === PLANNER_PASSWORD){
-    localStorage.setItem(LOGIN_KEY,"yes");
-    document.getElementById("lockScreen").style.display="none";
-    error.textContent="";
-  }else{
-    error.textContent="비밀번호 오류.";
-    input.select();
+
+function unlockPlanner() {
+  const input = document.getElementById("plannerPassword");
+  const error = document.getElementById("lockError");
+
+  if (input.value === "1021") {
+    localStorage.setItem(LOGIN_KEY, "yes");
+    document.getElementById("lockScreen").style.display = "none";
+    error.textContent = "";
+  } else {
+    error.textContent = "비밀번호 오류.";
   }
 }
+
+document.getElementById("unlockButton").addEventListener("click", unlockPlanner);
 function initLock(){
   const lock=document.getElementById("lockScreen");
   if(localStorage.getItem(LOGIN_KEY)==="yes"){
