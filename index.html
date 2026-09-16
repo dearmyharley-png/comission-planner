@@ -134,13 +134,13 @@ function saveItem(){
  const nameEl=document.getElementById('name'), typeEl=document.getElementById('type'), charsEl=document.getElementById('chars');
  const payEl=document.getElementById('pay'), dueEl=document.getElementById('due'), statusEl=document.getElementById('status');
  const o={id:Date.now(),name:nameEl.value.trim(),type:typeEl.value,chars:Number(charsEl.value)||0,pay:payEl.value,due:dueEl.value,status:statusEl.value,worked:0};
- if(!o.name||!o.due){alert('신청인과 마감일은 입력해줘.');return}
+ if(!o.name||!o.due){alert('신청인과 마감일을 입력해줘.');return}
  if(!validDate(o.due) || (o.pay && !validDate(o.pay))){alert('달력에서 날짜를 다시 선택해줘.');return}
  items.push(o); save();
  nameEl.value=''; charsEl.value=''; payEl.value=''; dueEl.value='';
  render();
 }
-function del(id){if(confirm('이 일정을 삭제할까?')){items=items.filter(x=>x.id!==id);save();render()}}
+function del(id){if(confirm('이 일정을 삭제할까요?')){items=items.filter(x=>x.id!==id);save();render()}}
 function toggle(id){let x=items.find(x=>x.id===id);x.status=x.status==='완료'?'진행 중':'완료';save();render()}
 function render(){
  let m=monday(weekOffset), end=new Date(m);end.setDate(end.getDate()+6);
