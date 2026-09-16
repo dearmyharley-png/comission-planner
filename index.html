@@ -113,7 +113,6 @@ td:last-child{color:var(--g);font-weight:700}
     <div id="lockError" class="lock-error"></div>
   </div>
 </div><div class="wrap">
-<div class="top"><div><h1>WEEKLY COMMISSION PLANNER</h1><div class="sub">마감은 위 · 결제 신청은 아래 · 이번 주는 자동으로 갱신</div></div><button class="btn white" onclick="goThisWeek()">이번 주</button></div>
 <div class="controls"><button class="btn" onclick="moveWeek(-1)">‹ 지난주</button><div id="range"></div><button class="btn" onclick="moveWeek(1)">다음주 ›</button></div>
 <div class="stats"><div class="stat"><b>이번 주 총 마감</b><span id="sCount">0건</span></div><div class="stat"><b>예정 글자수</b><span id="sPlanned">0자</span></div><div class="stat"><b>실제 작업량</b><span id="sWorked">0자</span></div><div class="stat"><b>남은 글자수</b><span id="sRemain">0자</span></div></div>
 <div id="week" class="week"></div>
@@ -126,7 +125,6 @@ td:last-child{color:var(--g);font-weight:700}
 <select id="status"><option>진행 중</option><option>완료</option></select>
 <button class="btn" style="background:#115E58;color:#fff" onclick="saveItem()">추가</button>
 </div>
-<div class="tiny">결제일·마감일은 달력에서 선택하면 돼. 작업글자수는 일정 추가 후 아래 목록에서 기록하면 돼. 입력 내용은 Supabase에 자동 저장돼.</div>
 <table><thead><tr><th>신청인</th><th>종류</th><th>글자수</th><th>결제일</th><th>마감일</th><th>상태</th><th>작업글자수</th><th></th></tr></thead><tbody id="tbody"></tbody></table>
 </div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
