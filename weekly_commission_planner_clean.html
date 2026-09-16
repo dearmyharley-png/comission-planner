@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weekly Commission Planner</title>
+<style>
+:root{
+  --g:#115E58; --g-dark:#0d4c47; --gp:#edf5f3; --bg:#f6f8f7;
+  --gray:#77817f; --grayp:#f1f3f2; --text:#25312e; --line:#e3e9e7;
+  --white:#fff; --shadow:0 8px 24px rgba(22,62,57,.055);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Pretendard,"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  font-size:14px;letter-spacing:-.015em;
+}
+button,input,select{font:inherit}
+.wrap{max-width:1480px;margin:30px auto 48px;padding:0 24px}
+.top{
+  background:var(--g);color:#fff;border-radius:16px;padding:22px 26px;
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  box-shadow:0 8px 24px rgba(17,94,88,.12)
+}
+h1{font-size:21px;letter-spacing:.02em;margin:0;font-weight:800}
+.sub{opacity:.72;font-size:12px;margin-top:6px}
+.btn{
+  border:1px solid transparent;border-radius:9px;padding:9px 13px;
+  font-weight:700;cursor:pointer;transition:.15s ease;background:#fff;color:var(--text)
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,50,45,.08)}
+.btn.white{background:#fff;color:var(--g)}
+.controls{display:flex;gap:8px;align-items:center;justify-content:center;margin:18px 0 14px}
+.controls button{background:#fff;border-color:var(--line);color:var(--g);box-shadow:0 2px 8px rgba(20,50,45,.025)}
+#range{font-weight:800;min-width:170px;text-align:center;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  box-shadow:var(--shadow)
+}
+.stat b{display:block;color:var(--gray);font-size:11px;font-weight:700;margin-bottom:6px}
+.stat span{font-size:19px;font-weight:800;color:var(--g);font-variant-numeric:tabular-nums}
+.week{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;overflow-x:auto;padding-bottom:3px}
+.day{
+  background:#fff;border-radius:12px;overflow:hidden;min-height:500px;
+  border:1px solid var(--line);box-shadow:0 3px 12px rgba(20,50,45,.025)
+}
+.dayhead{background:var(--g);color:#fff;text-align:center;padding:9px;font-weight:800;font-size:13px}
+.date{text-align:center;color:var(--text);font-weight:700;padding:9px 6px;border-bottom:1px solid #f0f3f2;font-size:12px}
+.sectiontitle{padding:7px;text-align:center;font-size:11px;font-weight:800;letter-spacing:.01em}
+.deadline .sectiontitle{background:var(--gp);color:var(--g)}
+.payment .sectiontitle{background:var(--grayp);color:var(--gray)}
+.section{padding:8px;min-height:165px}.payment .section{min-height:116px}
+.card{
+  padding:9px 9px;margin-bottom:6px;border-radius:8px;font-size:11.5px;
+  line-height:1.45;cursor:pointer;transition:.12s ease
+}
+.card:hover{transform:translateY(-1px)}
+.deadline .card{background:#f7faf9;color:var(--g);font-weight:750;border-left:3px solid var(--g)}
+.payment .card{background:#f7f8f8;color:#68716f;border-left:3px solid #c8cfcd}
+.empty{color:#b0b8b6;text-align:center;padding:20px 4px;font-size:11px}
+.remaining{
+  background:#f8fbfa;color:var(--g);font-weight:800;text-align:center;
+  padding:8px;font-size:11px;border-top:1px solid #edf2f0
+}
+.panel{
+  margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:20px;box-shadow:var(--shadow)
+}
+.panel h2{font-size:15px;margin:0 0 14px;color:var(--g)}
+.form{display:grid;grid-template-columns:1.25fr 1fr .8fr 1fr 1fr .9fr auto;gap:8px;align-items:stretch}
+.form input,.form select{
+  width:100%;border:1px solid #dce4e1;border-radius:8px;padding:10px 11px;
+  background:#fff;color:var(--text);outline:none;transition:.15s ease
+}
+.form input:focus,.form select:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(17,94,88,.08)}
+.date-field{position:relative;display:block}
+.date-field span{position:absolute;left:11px;top:5px;font-size:9px;color:var(--gray);z-index:1;pointer-events:none}
+.date-field input[type=date]{padding-top:18px;padding-bottom:5px;cursor:pointer}
+.date-field input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.65}
+.tiny{font-size:10.5px;color:#8a9390;margin-top:10px}
+table{width:100%;border-collapse:separate;border-spacing:0;margin-top:16px;font-size:12px}
+th,td{padding:10px 8px;border-bottom:1px solid #edf1ef;text-align:center}
+th{color:var(--gray);font-size:10.5px;font-weight:700;background:#fafbfb}
+tbody tr:hover{background:#fafcfb}
+td:last-child{color:var(--g);font-weight:700}
+.work-edit{
+  width:94px!important;border:1px solid #dce5e2!important;border-radius:7px!important;
+  padding:6px 7px!important;color:var(--g)!important;font-weight:750!important;text-align:right!important
+}
+.done{opacity:.42;text-decoration:line-through}
+@media(max-width:900px){
+  .wrap{padding:0 12px;margin-top:14px}.top{padding:18px}
+  .stats{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr 1fr}
+  .week{grid-template-columns:repeat(7,178px)}.panel{padding:14px}
+}
+</style>
+</head>
+<body><div class="wrap">
+<div class="top"><div><h1>WEEKLY COMMISSION PLANNER</h1><div class="sub">마감은 위 · 결제 신청은 아래 · 이번 주는 자동으로 갱신</div></div><button class="btn white" onclick="goThisWeek()">이번 주</button></div>
+<div class="controls"><button class="btn" onclick="moveWeek(-1)">‹ 지난주</button><div id="range"></div><button class="btn" onclick="moveWeek(1)">다음주 ›</button></div>
+<div class="stats"><div class="stat"><b>이번 주 총 마감</b><span id="sCount">0건</span></div><div class="stat"><b>예정 글자수</b><span id="sPlanned">0자</span></div><div class="stat"><b>실제 작업량</b><span id="sWorked">0자</span></div><div class="stat"><b>남은 글자수</b><span id="sRemain">0자</span></div></div>
+<div id="week" class="week"></div>
+<div class="panel"><h2>일정 입력</h2>
+<div class="form">
+<input id="name" placeholder="신청인">
+<select id="type"><option>썰</option><option>야썰</option><option>소설</option><option>감상</option><option>그림 감상</option></select>
+<input id="chars" type="number" min="0" step="100" placeholder="글자수">
+<label class="date-field"><span>결제일</span><input id="pay" type="date"></label><label class="date-field"><span>마감일</span><input id="due" type="date"></label>
+<select id="status"><option>진행 중</option><option>완료</option></select>
+<button class="btn" style="background:#115E58;color:#fff" onclick="saveItem()">추가</button>
+</div>
+<div class="tiny">결제일·마감일은 달력 아이콘을 눌러 날짜를 선택하면 돼. 작업글자수는 일정 추가 후 아래 목록에서 기록하면 돼. 데이터는 이 브라우저에 자동 저장돼.</div>
+<table><thead><tr><th>신청인</th><th>종류</th><th>글자수</th><th>결제일</th><th>마감일</th><th>상태</th><th>작업글자수</th><th></th></tr></thead><tbody id="tbody"></tbody></table>
+</div></div>
+<script>
+const KEY='commissionPlannerV1';
+function loadItems(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){console.warn('storage load failed',e);return []}}
+let items=loadItems(); let weekOffset=0;
+const fmt=n=>(Number(n)||0).toLocaleString('ko-KR')+'자';
+function iso(d){let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
+function monday(off=0){let d=new Date(), day=d.getDay()||7;d.setHours(12,0,0,0);d.setDate(d.getDate()-day+1+off*7);return d}
+function moveWeek(n){weekOffset+=n;render()} function goThisWeek(){weekOffset=0;render()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(items));return true}catch(e){console.warn('storage save failed',e);return false}}
+function formatDateInput(el){
+ let v=el.value.replace(/\D/g,'').slice(0,8);
+ if(v.length>4) v=v.slice(0,4)+'-'+v.slice(4);
+ if(v.length>7) v=v.slice(0,7)+'-'+v.slice(7);
+ el.value=v;
+}
+function validDate(v){return /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(new Date(v+'T12:00:00').getTime())}
+function updateWorked(id,value){let x=items.find(x=>x.id===id); if(!x)return; x.worked=Math.max(0,+value||0); save(); render()}
+function saveItem(){
+ const nameEl=document.getElementById('name'), typeEl=document.getElementById('type'), charsEl=document.getElementById('chars');
+ const payEl=document.getElementById('pay'), dueEl=document.getElementById('due'), statusEl=document.getElementById('status');
+ const o={id:Date.now(),name:nameEl.value.trim(),type:typeEl.value,chars:Number(charsEl.value)||0,pay:payEl.value,due:dueEl.value,status:statusEl.value,worked:0};
+ if(!o.name||!o.due){alert('신청인과 마감일은 입력해줘.');return}
+ if(!validDate(o.due) || (o.pay && !validDate(o.pay))){alert('달력에서 날짜를 다시 선택해줘.');return}
+ items.push(o); save();
+ nameEl.value=''; charsEl.value=''; payEl.value=''; dueEl.value='';
+ render();
+}
+function del(id){if(confirm('이 일정을 삭제할까?')){items=items.filter(x=>x.id!==id);save();render()}}
+function toggle(id){let x=items.find(x=>x.id===id);x.status=x.status==='완료'?'진행 중':'완료';save();render()}
+function render(){
+ let m=monday(weekOffset), end=new Date(m);end.setDate(end.getDate()+6);
+ document.getElementById('range').textContent=`${m.getMonth()+1}/${m.getDate()} ~ ${end.getMonth()+1}/${end.getDate()}`;
+ let dates=[...Array(7)].map((_,k)=>{let d=new Date(m);d.setDate(d.getDate()+k);return d});
+ let start=iso(m), finish=iso(end), active=items.filter(x=>x.status!=='완료'&&x.due>=start&&x.due<=finish);
+ document.getElementById('sCount').textContent=active.length+'건'; let planned=active.reduce((a,x)=>a+x.chars,0), worked=active.reduce((a,x)=>a+x.worked,0);
+ document.getElementById('sPlanned').textContent=fmt(planned);document.getElementById('sWorked').textContent=fmt(worked);document.getElementById('sRemain').textContent=fmt(Math.max(0,planned-worked));
+ let names=['월','화','수','목','금','토','일']; const weekEl=document.getElementById('week'); weekEl.innerHTML='';
+ dates.forEach((d,idx)=>{let ds=iso(d), dues=items.filter(x=>x.status!=='완료'&&x.due===ds), pays=items.filter(x=>x.status!=='완료'&&x.pay===ds);
+ let rem=Math.max(0,dues.reduce((a,x)=>a+x.chars-x.worked,0));
+ let cards=a=>a.length?a.map(x=>`<div class="card" onclick="document.getElementById('r${x.id}').scrollIntoView({behavior:'smooth'})">${x.name} · ${x.type} · ${fmt(x.chars)}</div>`).join(''):'<div class="empty">일정 없음</div>';
+ weekEl.insertAdjacentHTML('beforeend',`<div class="day"><div class="dayhead">${names[idx]}</div><div class="date">${d.getMonth()+1}월 ${d.getDate()}일</div><div class="deadline"><div class="sectiontitle">마감</div><div class="section">${cards(dues)}</div></div><div class="payment"><div class="sectiontitle">결제 신청</div><div class="section">${cards(pays)}</div></div><div class="remaining">남은 분량 ${fmt(rem)}</div></div>`);
+ });
+ document.getElementById('tbody').innerHTML=items.slice().sort((a,b)=>a.due.localeCompare(b.due)).map(x=>`<tr id="r${x.id}" class="${x.status==='완료'?'done':''}"><td>${x.name}</td><td>${x.type}</td><td>${fmt(x.chars)}</td><td>${x.pay||'-'}</td><td>${x.due}</td><td><button class="btn" onclick="toggle(${x.id})">${x.status}</button></td><td><input class="work-edit" type="number" min="0" step="100" value="${x.worked||0}" onchange="updateWorked(${x.id},this.value)"> 자</td><td><button class="btn" onclick="del(${x.id})">삭제</button></td></tr>`).join('');
+}
+render();
+</script></body></html>
