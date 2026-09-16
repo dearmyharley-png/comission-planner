@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Weekly Commission Planner</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A4%8D%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --g:#115E58; --g-dark:#0d4c47; --gp:#edf5f3; --bg:#f6f8f7;
@@ -137,33 +138,29 @@ const PLANNER_PASSWORD = "1021";
 
 const LOGIN_KEY = "commissionPlannerUnlockedV1";
 
-
-function unlockPlanner() {
+function unlockPlanner(){
   const input = document.getElementById("plannerPassword");
   const error = document.getElementById("lockError");
-
-  if (input.value === "1021") {
-    localStorage.setItem(LOGIN_KEY, "yes");
+  if (input && input.value === "1021") {
+    try { localStorage.setItem(LOGIN_KEY, "yes"); } catch(e) {}
     document.getElementById("lockScreen").style.display = "none";
-    error.textContent = "";
-  } else {
+    if (error) error.textContent = "";
+  } else if (error) {
     error.textContent = "비밀번호 오류.";
   }
 }
 
-document.getElementById("unlockButton").addEventListener("click", unlockPlanner);
-function initLock(){
-  const lock=document.getElementById("lockScreen");
-  if(localStorage.getItem(LOGIN_KEY)==="yes"){
-    lock.style.display="none";
-  }else{
-    lock.style.display="flex";
-    setTimeout(()=>document.getElementById("plannerPassword")?.focus(),50);
+(function initLockImmediately(){
+  const lock = document.getElementById("lockScreen");
+  const input = document.getElementById("plannerPassword");
+  const button = document.getElementById("unlockButton");
+  try { if (localStorage.getItem(LOGIN_KEY) === "yes") lock.style.display = "none"; } catch(e) {}
+  if (button) button.onclick = unlockPlanner;
+  if (input) {
+    input.onkeydown = function(e){ if (e.key === "Enter") unlockPlanner(); };
+    setTimeout(function(){ input.focus(); }, 50);
   }
-  document.getElementById("plannerPassword")?.addEventListener("keydown",e=>{
-    if(e.key==="Enter") unlockPlanner();
-  });
-}
+})();
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let items = [];
@@ -255,7 +252,6 @@ function render(){
   document.getElementById('tbody').innerHTML=items.slice().sort((a,b)=>(a.due||'').localeCompare(b.due||'')).map(x=>`<tr id="r${x.id}" class="${x.status==='완료'?'done':''}"><td>${x.name}</td><td>${x.type}</td><td>${fmt(x.chars)}</td><td>${x.pay||'-'}</td><td>${x.due||'-'}</td><td><button class="btn" onclick="toggle(${x.id})">${x.status}</button></td><td><input class="work-edit" type="number" min="0" step="100" value="${x.worked||0}" onchange="updateWorked(${x.id},this.value)"> 자</td><td><button class="btn" onclick="del(${x.id})">삭제</button></td></tr>`).join('');
 }
 
-initLock();
 render();
 loadItems();
 </script></body></html>
