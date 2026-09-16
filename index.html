@@ -194,7 +194,6 @@ async function loadItems(){
 }
 
 async function saveItem(){
-  if(!configured()){alert('먼저 HTML 안에 Supabase URL과 Publishable key를 넣어줘.');return;}
   const nameEl=document.getElementById('name'), typeEl=document.getElementById('type'), charsEl=document.getElementById('chars');
   const payEl=document.getElementById('pay'), dueEl=document.getElementById('due'), statusEl=document.getElementById('status');
   const o={
