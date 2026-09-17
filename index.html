@@ -612,7 +612,7 @@ function renderWorkCalendar(){
       <div class="work-day-num">${d.getDate()}</div>
       <div class="work-auto">${fmt(total)}</div>
       <div class="work-manual">
-        <input id="${inputId}" type="number" min="0" step="100" placeholder="+ 직접 추가">
+        <input id="${inputId}" type="number" min="0" step="100">
         <button type="button" onclick="addManualWork('${ds}','${inputId}')">+</button>
       </div>
     </div>`;
