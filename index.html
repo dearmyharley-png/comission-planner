@@ -34,26 +34,50 @@ h1{font-size:21px;letter-spacing:.02em;margin:0;font-weight:800}
 .controls{display:flex;gap:8px;align-items:center;justify-content:center;margin:18px 0 14px}
 .controls button{background:#fff;border-color:var(--line);color:var(--g);box-shadow:0 2px 8px rgba(20,50,45,.025)}
 #range{font-weight:800;min-width:170px;text-align:center;font-size:14px}
-  .week-picker{
-  position:relative;
+.week-select-btn{
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:var(--text) !important;
+  font-weight:800;
+  font-size:14px;
+  padding:8px 10px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.week-select-btn:hover{
+  background:var(--gp) !important;
+  border-radius:8px;
+  transform:none !important;
+  box-shadow:none !important;
+}
+
+.calendar-icon{
+  color:var(--g);
+  font-size:11px;
+}
+
+.today-btn{
+  width:34px;
+  height:34px;
+  padding:0 !important;
+  border-radius:50% !important;
   display:flex;
   align-items:center;
   justify-content:center;
-  min-width:170px;
-  cursor:pointer;
+  font-size:16px;
+  color:var(--g) !important;
+  background:transparent !important;
+  border:1px solid var(--line) !important;
+  box-shadow:none !important;
 }
 
-.week-picker #range{
-  pointer-events:none;
-}
-
-.week-picker input[type="date"]{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0;
-  cursor:pointer;
+.today-btn:hover{
+  background:var(--gp) !important;
+  transform:none !important;
 }
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
 .stat{
@@ -204,13 +228,26 @@ td:last-child{color:var(--g);font-weight:700}
 <div class="controls">
   <button class="btn" onclick="moveWeek(-1)">‹ 지난주</button>
 
-  <label class="week-picker">
-    <div id="range">주차 선택</div>
-    <input id="weekPicker" type="date" onchange="goToSelectedWeek(this.value)">
-  </label>
+  <button class="week-select-btn" type="button" onclick="openWeekPicker()">
+    <span id="range"></span>
+    <span class="calendar-icon">▾</span>
+  </button>
 
-  <button class="btn" onclick="goThisWeek()">이번주</button>
+  <input
+    id="weekPicker"
+    type="date"
+    onchange="goToSelectedWeek(this.value)"
+    style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;"
+  >
+
   <button class="btn" onclick="moveWeek(1)">다음주 ›</button>
+
+  <button
+    class="today-btn"
+    type="button"
+    onclick="goThisWeek()"
+    title="이번주로 이동"
+  >↺</button>
 </div>
   <div class="stats">
   <div class="stat"><b>이번 주 총 마감</b><span id="sCount">0건</span></div>
@@ -320,6 +357,19 @@ function iso(d){let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffse
 function monday(off=0){let d=new Date(), day=d.getDay()||7;d.setHours(12,0,0,0);d.setDate(d.getDate()-day+1+off*7);return d}
 function moveWeek(n){weekOffset+=n;render()}
 function goThisWeek(){weekOffset=0;render()}
+  
+  function openWeekPicker(){
+  const picker=document.getElementById('weekPicker');
+
+  picker.value=iso(monday(weekOffset));
+
+  if(typeof picker.showPicker==='function'){
+    picker.showPicker();
+  }else{
+    picker.click();
+  }
+}
+  
   function goToSelectedWeek(value){
   if(!value || !validDate(value)) return;
 
