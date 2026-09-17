@@ -265,19 +265,15 @@ function render(){
   let m=monday(weekOffset), end=new Date(m);end.setDate(end.getDate()+6);
   document.getElementById('range').textContent=`${m.getMonth()+1}/${m.getDate()} ~ ${end.getMonth()+1}/${end.getDate()}`;
   let dates=[...Array(7)].map((_,k)=>{let d=new Date(m);d.setDate(d.getDate()+k);return d});
-  let start=iso(m), finish=iso(end),
-    active=items.filter(x=>x.status!=='완료'&&x.due>=start&&x.due<=finish),
-    totalDone=items.filter(x=>x.status==='완료').length;
+let start=iso(m), finish=iso(end), active=items.filter(x=>x.status!=='완료'&&x.due>=start&&x.due<=finish);
+let totalDone=items.filter(x=>x.status==='완료').length;
+document.getElementById('sTotalDone').textContent=totalDone+'건';
 
 document.getElementById('sCount').textContent=active.length+'건';
-
-let planned=active.reduce((a,x)=>a+x.chars,0),
-    worked=active.reduce((a,x)=>a+x.worked,0);
-
+let planned=active.reduce((a,x)=>a+x.chars,0), worked=active.reduce((a,x)=>a+x.worked,0);
 document.getElementById('sPlanned').textContent=fmt(planned);
 document.getElementById('sWorked').textContent=fmt(worked);
 document.getElementById('sRemain').textContent=fmt(Math.max(0,planned-worked));
-document.getElementById('sTotalDone').textContent=totalDone+'건';
 
   let names=['월','화','수','목','금','토','일']; const weekEl=document.getElementById('week'); weekEl.innerHTML='';
   dates.forEach((d,idx)=>{
