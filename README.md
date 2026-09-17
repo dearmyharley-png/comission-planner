@@ -21,4 +21,4 @@
 프로그램의 무단 재배포, 수정본 재배포 및
 코드를 이용한 동일·유사 서비스의 제작 및 배포를 금지합니다.
 
-Copyright © 2026 김지연. All rights reserved.
+Copyright © 2026 tiredsotired. All rights reserved.
