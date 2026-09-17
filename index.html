@@ -59,18 +59,18 @@ h1{font-size:21px;letter-spacing:.02em;margin:0;font-weight:800}
 .card:hover{transform:translateY(-1px)}
 .deadline .card{background:#f7faf9;color:var(--g);font-weight:750;border-left:3px solid var(--g)}
 .payment .card{background:#f7f8f8;color:#68716f;border-left:3px solid #c8cfcd}
-  .completed-card{
-  background:#f1f3f2;
-  color:#9aa3a0;
-  border-left:3px solid #c8cfcd;
+.deadline .card.completed-card{
+  background:#eeeeee;
+  color:#999999;
+  border-left:3px solid #bdbdbd;
   text-decoration:none;
-  opacity:.75;
+  opacity:1;
 }
 
-.completed-card::before{
+.deadline .card.completed-card::before{
   content:"✓ 완료 · ";
   font-weight:800;
-  color:var(--g);
+  color:#888888;
 }
 .empty{color:#b0b8b6;text-align:center;padding:20px 4px;font-size:11px}
 .remaining{
