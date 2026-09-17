@@ -193,9 +193,10 @@ td:last-child{color:var(--g);font-weight:700}
 .lock-error{height:18px;margin-top:8px;color:#a34d4d;font-size:11px}
 
 .view-tabs{
-  max-width:1200px;
-  margin-left:auto;
-  margin-right:auto;
+  width:100%;
+  max-width:none;
+  margin-left:0;
+  margin-right:0;
 }
 /* 상단 타이틀 */
 .planner-header{
@@ -218,6 +219,15 @@ td:last-child{color:var(--g);font-weight:700}
   font-size:12px;
   font-weight:600;
   opacity:.65;
+}
+
+/* Align header, tabs, planner, and work calendar to the same outer lines */
+#plannerView,
+#workView{
+  width:100%;
+  max-width:none;
+  margin-left:0;
+  margin-right:0;
 }
 
 /* 작업 기록 */
