@@ -546,9 +546,9 @@ document.getElementById('sRemain').textContent=fmt(Math.max(0,planned-worked));
 
   let rem=Math.max(0,dues.reduce((a,x)=>a+x.chars-x.worked,0));
 
-  let cards=a=>a.length
-    ? a.map(x=>`<div class="card" onclick="document.getElementById('r${x.id}').scrollIntoView({behavior:'smooth'})">${x.name} · ${x.type} · ${fmt(x.chars)}</div>`).join('')
-    : '<div class="empty">일정 없음</div>';
+let cards=a=>a.length
+  ? a.map(x=>`<div class="card" onclick="document.getElementById('r${x.id}').scrollIntoView({behavior:'smooth'})">${x.name} · ${x.type} · ${fmt(x.chars)}</div>`).join('')
+  : '';
 
   let completedCards=completed.map(x=>
     `<div class="card completed-card" onclick="document.getElementById('r${x.id}').scrollIntoView({behavior:'smooth'})">${x.name} · ${x.type} · ${fmt(x.chars)}</div>`
