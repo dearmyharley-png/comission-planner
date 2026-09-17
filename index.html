@@ -59,6 +59,19 @@ h1{font-size:21px;letter-spacing:.02em;margin:0;font-weight:800}
 .card:hover{transform:translateY(-1px)}
 .deadline .card{background:#f7faf9;color:var(--g);font-weight:750;border-left:3px solid var(--g)}
 .payment .card{background:#f7f8f8;color:#68716f;border-left:3px solid #c8cfcd}
+  .completed-card{
+  background:#f1f3f2;
+  color:#9aa3a0;
+  border-left:3px solid #c8cfcd;
+  text-decoration:none;
+  opacity:.75;
+}
+
+.completed-card::before{
+  content:"✓ 완료 · ";
+  font-weight:800;
+  color:var(--g);
+}
 .empty{color:#b0b8b6;text-align:center;padding:20px 4px;font-size:11px}
 .remaining{
   background:#f8fbfa;color:var(--g);font-weight:800;text-align:center;
@@ -256,11 +269,42 @@ function render(){
 
   let names=['월','화','수','목','금','토','일']; const weekEl=document.getElementById('week'); weekEl.innerHTML='';
   dates.forEach((d,idx)=>{
-    let ds=iso(d), dues=items.filter(x=>x.status!=='완료'&&x.due===ds), pays=items.filter(x=>x.status!=='완료'&&x.pay===ds);
-    let rem=Math.max(0,dues.reduce((a,x)=>a+x.chars-x.worked,0));
-    let cards=a=>a.length?a.map(x=>`<div class="card" onclick="document.getElementById('r${x.id}').scrollIntoView({behavior:'smooth'})">${x.name} · ${x.type} · ${fmt(x.chars)}</div>`).join(''):'<div class="empty">일정 없음</div>';
-    weekEl.insertAdjacentHTML('beforeend',`<div class="day"><div class="dayhead">${names[idx]}</div><div class="date">${d.getMonth()+1}월 ${d.getDate()}일</div><div class="deadline"><div class="sectiontitle">마감</div><div class="section">${cards(dues)}</div></div><div class="payment"><div class="sectiontitle">결제 신청</div><div class="section">${cards(pays)}</div></div><div class="remaining">남은 분량 ${fmt(rem)}</div></div>`);
-  });
+  let ds=iso(d),
+      dues=items.filter(x=>x.status!=='완료'&&x.due===ds),
+      completed=items.filter(x=>x.status==='완료'&&x.due===ds),
+      pays=items.filter(x=>x.status!=='완료'&&x.pay===ds);
+
+  let rem=Math.max(0,dues.reduce((a,x)=>a+x.chars-x.worked,0));
+
+  let cards=a=>a.length
+    ? a.map(x=>`<div class="card" onclick="document.getElementById('r${x.id}').scrollIntoView({behavior:'smooth'})">${x.name} · ${x.type} · ${fmt(x.chars)}</div>`).join('')
+    : '<div class="empty">일정 없음</div>';
+
+  let completedCards=completed.map(x=>
+    `<div class="card completed-card" onclick="document.getElementById('r${x.id}').scrollIntoView({behavior:'smooth'})">${x.name} · ${x.type} · ${fmt(x.chars)}</div>`
+  ).join('');
+   weekEl.insertAdjacentHTML(
+  'beforeend',
+  `<div class="day">
+    <div class="dayhead">${names[idx]}</div>
+    <div class="date">${d.getMonth()+1}월 ${d.getDate()}일</div>
+
+    <div class="deadline">
+      <div class="sectiontitle">마감</div>
+      <div class="section">
+        ${cards(dues)}
+        ${completedCards}
+      </div>
+    </div>
+
+    <div class="payment">
+      <div class="sectiontitle">결제 신청</div>
+      <div class="section">${cards(pays)}</div>
+    </div>
+
+    <div class="remaining">남은 분량 ${fmt(rem)}</div>
+  </div>`
+);
 
 document.getElementById('tbody').innerHTML=items.slice().sort((a,b)=>(a.due||'').localeCompare(b.due||'')).map(x=>`<tr id="r${x.id}" class="${x.status==='완료'?'done':''}"><td>${x.name}</td><td>${x.type}</td><td>${fmt(x.chars)}</td><td>${x.pay||'-'}</td><td><input type="date" value="${x.due||''}" onchange="updateDueDate(${x.id},this.value)" style="border:1px solid #dce4e1;border-radius:7px;padding:6px 7px;color:var(--g);background:#fff"></td><td><button class="btn" onclick="toggle(${x.id})">${x.status}</button></td><td><input class="work-edit" type="number" min="0" step="100" value="${x.worked||0}" onchange="updateWorked(${x.id},this.value)"> 자</td><td><button class="btn" onclick="del(${x.id})">삭제</button></td></tr>`).join('');
 }
