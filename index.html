@@ -313,7 +313,7 @@ document.getElementById('sRemain').textContent=fmt(Math.max(0,planned-worked));
     <div class="remaining">남은 분량 ${fmt(rem)}</div>
   </div>`
 );
-
+});
 document.getElementById('tbody').innerHTML=items.slice().sort((a,b)=>(a.due||'').localeCompare(b.due||'')).map(x=>`<tr id="r${x.id}" class="${x.status==='완료'?'done':''}"><td>${x.name}</td><td>${x.type}</td><td>${fmt(x.chars)}</td><td>${x.pay||'-'}</td><td><input type="date" value="${x.due||''}" onchange="updateDueDate(${x.id},this.value)" style="border:1px solid #dce4e1;border-radius:7px;padding:6px 7px;color:var(--g);background:#fff"></td><td><button class="btn" onclick="toggle(${x.id})">${x.status}</button></td><td><input class="work-edit" type="number" min="0" step="100" value="${x.worked||0}" onchange="updateWorked(${x.id},this.value)"> 자</td><td><button class="btn" onclick="del(${x.id})">삭제</button></td></tr>`).join('');
 }
 
