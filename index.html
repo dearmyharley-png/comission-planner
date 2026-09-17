@@ -31,8 +31,38 @@ h1{font-size:21px;letter-spacing:.02em;margin:0;font-weight:800}
 }
 .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,50,45,.08)}
 .btn.white{background:#fff;color:var(--g)}
-.controls{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:18px 0 14px}
-.controls button{background:#fff;border-color:var(--line);color:var(--g);box-shadow:0 2px 8px rgba(20,50,45,.025)}
+.controls{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  align-items:center;
+  margin:18px 0 14px;
+}
+
+.week-controls{
+  grid-column:4;
+  display:grid;
+  grid-template-columns:34px 1fr 34px;
+  align-items:center;
+  gap:0;
+}
+
+.week-controls .btn{
+  width:34px;
+  height:34px;
+  padding:0;
+}
+
+.week-select-btn{
+  width:100%;
+  justify-content:center;
+}
+
+.today-btn{
+  grid-column:5;
+  justify-self:start;
+}
+  .controls button{background:#fff;border-color:var(--line);color:var(--g);box-shadow:0 2px 8px rgba(20,50,45,.025)}
 #range{font-weight:800;min-width:170px;text-align:center;font-size:14px}
 .week-select-btn{
   border:0 !important;
@@ -278,10 +308,17 @@ td:last-child{color:var(--g);font-weight:700}
 <div class="controls">
 <button class="btn" onclick="moveWeek(-1)">‹</button>
 
-  <button class="week-select-btn" type="button" onclick="openWeekPicker()">
-    <span id="range"></span>
-    <span class="calendar-icon">▾</span>
-  </button>
+<div class="controls">
+  <div class="week-controls">
+    <button class="btn" onclick="moveWeek(-1)">‹</button>
+
+    <button class="week-select-btn" type="button" onclick="openWeekPicker()">
+      <span id="range"></span>
+      <span class="calendar-icon">▾</span>
+    </button>
+
+    <button class="btn" onclick="moveWeek(1)">›</button>
+  </div>
 
   <input
     id="weekPicker"
@@ -290,8 +327,6 @@ td:last-child{color:var(--g);font-weight:700}
     style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;"
   >
 
-<button class="btn" onclick="moveWeek(1)">›</button>
-  
   <button
     class="today-btn"
     type="button"
