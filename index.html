@@ -189,7 +189,6 @@ td:last-child{color:var(--g);font-weight:700}
 .work-day.other{opacity:.35;background:#fafbfb}
 .work-day.today{border-color:var(--g);box-shadow:inset 0 0 0 1px var(--g)}
 .work-day-num{font-size:11px;font-weight:850;margin-bottom:7px}
-.work-auto-label{font-size:9px;color:#9aa3a0;margin-bottom:2px}
 .work-auto{font-size:13px;font-weight:850;color:var(--g);margin-bottom:7px}
 .work-manual{display:flex;gap:4px}
 .work-manual input{min-width:0;width:100%;border:1px solid var(--line);border-radius:7px;padding:6px 7px;font-size:10px}
@@ -527,7 +526,6 @@ function renderWorkCalendar(){
     const inputId='manualWork_'+ds.replaceAll('-','_');
     html+=`<div class="work-day ${inMonth?'':'other'} ${ds===today?'today':''}">
       <div class="work-day-num">${d.getDate()}</div>
-      <div class="work-auto-label">자동 ${fmt(auto)}${manual?` · 직접 ${fmt(manual)}`:''}</div>
       <div class="work-auto">${fmt(total)}</div>
       <div class="work-manual">
         <input id="${inputId}" type="number" min="0" step="100" placeholder="+ 직접 추가">
