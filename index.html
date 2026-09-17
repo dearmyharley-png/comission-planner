@@ -34,6 +34,27 @@ h1{font-size:21px;letter-spacing:.02em;margin:0;font-weight:800}
 .controls{display:flex;gap:8px;align-items:center;justify-content:center;margin:18px 0 14px}
 .controls button{background:#fff;border-color:var(--line);color:var(--g);box-shadow:0 2px 8px rgba(20,50,45,.025)}
 #range{font-weight:800;min-width:170px;text-align:center;font-size:14px}
+  .week-picker{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:170px;
+  cursor:pointer;
+}
+
+.week-picker #range{
+  pointer-events:none;
+}
+
+.week-picker input[type="date"]{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  cursor:pointer;
+}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
 .stat{
   background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
@@ -180,8 +201,18 @@ td:last-child{color:var(--g);font-weight:700}
   <button id="tabWork" class="view-tab" type="button" onclick="showView('work')">작업 기록</button>
 </div>
 <div id="plannerView" class="view-page active">
-<div class="controls"><button class="btn" onclick="moveWeek(-1)">‹ 지난주</button><div id="range"></div><button class="btn" onclick="moveWeek(1)">다음주 ›</button></div>
-<div class="stats">
+<div class="controls">
+  <button class="btn" onclick="moveWeek(-1)">‹ 지난주</button>
+
+  <label class="week-picker">
+    <div id="range">주차 선택</div>
+    <input id="weekPicker" type="date" onchange="goToSelectedWeek(this.value)">
+  </label>
+
+  <button class="btn" onclick="goThisWeek()">이번주</button>
+  <button class="btn" onclick="moveWeek(1)">다음주 ›</button>
+</div>
+  <div class="stats">
   <div class="stat"><b>이번 주 총 마감</b><span id="sCount">0건</span></div>
   <div class="stat"><b>예정 글자수</b><span id="sPlanned">0자</span></div>
   <div class="stat"><b>실제 작업량</b><span id="sWorked">0자</span></div>
@@ -289,6 +320,23 @@ function iso(d){let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffse
 function monday(off=0){let d=new Date(), day=d.getDay()||7;d.setHours(12,0,0,0);d.setDate(d.getDate()-day+1+off*7);return d}
 function moveWeek(n){weekOffset+=n;render()}
 function goThisWeek(){weekOffset=0;render()}
+  function goToSelectedWeek(value){
+  if(!value || !validDate(value)) return;
+
+  const selected = new Date(value + 'T12:00:00');
+
+  const selectedDay = selected.getDay() || 7;
+  const selectedMonday = new Date(selected);
+  selectedMonday.setDate(selected.getDate() - selectedDay + 1);
+  selectedMonday.setHours(12,0,0,0);
+
+  const thisMonday = monday(0);
+
+  const diff = selectedMonday.getTime() - thisMonday.getTime();
+  weekOffset = Math.round(diff / (7 * 24 * 60 * 60 * 1000));
+
+  render();
+}
 function validDate(v){return /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(new Date(v+'T12:00:00').getTime())}
 
 
