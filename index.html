@@ -261,7 +261,24 @@ async function toggle(id){
   await loadItems();
 }
 
+  async function updateWorked(id,value){
+  const worked=Math.max(0,Number(value)||0);
+
+  const {error}=await db
+    .from('commissions')
+    .update({worked:worked})
+    .eq('id',id);
+
+  if(error){
+    console.error(error);
+    alert('작업글자수 저장에 실패했습니다: '+error.message);
+    return;
+  }
+
+  await loadItems();
+}
 function render(){
+  
   let m=monday(weekOffset), end=new Date(m);end.setDate(end.getDate()+6);
   document.getElementById('range').textContent=`${m.getMonth()+1}/${m.getDate()} ~ ${end.getMonth()+1}/${end.getDate()}`;
   let dates=[...Array(7)].map((_,k)=>{let d=new Date(m);d.setDate(d.getDate()+k);return d});
