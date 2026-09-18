@@ -10,4 +10,4 @@
 본 프로그램 및 소스코드의 무단 복제, 수정·재배포,
 상업적 이용 및 동일·유사 서비스 제작을 금지합니다.
 
-© 2026 김지연. All rights reserved.
+© 2026 tiredsotired. All rights reserved.
