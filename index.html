@@ -660,15 +660,12 @@ function setDailyWork(ds,inputId){
   const input=document.getElementById(inputId);
   if(!input) return;
 
-  const wantedTotal=Math.max(0,Number(input.value)||0);
-  const auto=autoWorkForDate(ds);
+  // 입력칸은 그 날짜의 작업량에 더하거나 뺄 증감값이다.
+  // 예: +300 입력 → 300자 추가, -2000 입력 → 2,000자 차감.
+  const amount=Number(String(input.value).replace(/,/g,''))||0;
+  if(!amount){ input.value=''; return; }
 
-  // 달력 입력값은 "더할 양"이 아니라 그 날짜의 최종 총 작업량이다.
-  // 일정에서 자동 합산된 작업량과의 차이를 manualWork에 저장하므로
-  // 기존 총량보다 작은 숫자를 입력해도 정상적으로 줄일 수 있다.
-  manualWork[ds]=wantedTotal-auto;
-
-  // 차이가 0이면 불필요한 보정값은 제거한다.
+  manualWork[ds]=manualWorkForDate(ds)+amount;
   if(manualWork[ds]===0) delete manualWork[ds];
 
   try { localStorage.setItem('commissionPlannerManualWorkV1',JSON.stringify(manualWork)); } catch(e) {}
@@ -695,8 +692,8 @@ function renderWorkCalendar(){
       <div class="work-day-num">${d.getDate()}</div>
       <div class="work-auto">${fmt(total)}</div>
       <div class="work-manual">
-        <input id="${inputId}" type="number" min="0" step="100" value="${total}" onkeydown="if(event.key==='Enter') setDailyWork('${ds}','${inputId}')">
-        <button type="button" onclick="setDailyWork('${ds}','${inputId}')">✓</button>
+        <input id="${inputId}" type="number" step="100" placeholder="+300 / -2000" onkeydown="if(event.key==='Enter') setDailyWork('${ds}','${inputId}')">
+        <button type="button" onclick="setDailyWork('${ds}','${inputId}')">+</button>
       </div>
     </div>`;
   }
