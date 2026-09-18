@@ -692,7 +692,7 @@ function renderWorkCalendar(){
       <div class="work-day-num">${d.getDate()}</div>
       <div class="work-auto">${fmt(total)}</div>
       <div class="work-manual">
-        <input id="${inputId}" type="number" step="100" placeholder="+300 / -2000" onkeydown="if(event.key==='Enter') setDailyWork('${ds}','${inputId}')">
+        <input id="${inputId}" type="number" step="100" onkeydown="if(event.key==='Enter') setDailyWork('${ds}','${inputId}')">
         <button type="button" onclick="setDailyWork('${ds}','${inputId}')">+</button>
       </div>
     </div>`;
