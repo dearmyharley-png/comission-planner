@@ -433,7 +433,6 @@ td:last-child{color:var(--g);font-weight:700}
       <div class="work-weekdays"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
       <div id="workCalendar" class="work-calendar"></div>
     </div>
-    <div class="work-note">일정 관리에서 입력한 작업글자수는 해당 일정의 마감일에 자동 합산됩니다. 날짜 칸의 입력창에서는 별도 작업량을 직접 더할 수 있습니다.</div>
   </div>
 </div>
 
@@ -490,6 +489,7 @@ async function initAuth(){
   if(user){
     lock.style.display='none';
     await loadItems();
+    await loadWorkLogs();
   }else{
     lock.style.display='flex';
     setTimeout(()=>email?.focus(),50);
@@ -507,7 +507,6 @@ let items = [];
 let weekOffset = 0;
 let workMonthOffset = 0;
 let manualWork = {};
-try { manualWork = JSON.parse(localStorage.getItem('commissionPlannerManualWorkV1') || '{}') || {}; } catch(e) { manualWork = {}; }
 
 const fmt=n=>(Number(n)||0).toLocaleString('ko-KR')+'자';
 function iso(d){let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
@@ -638,7 +637,7 @@ function showView(view){
   document.getElementById('workView').classList.toggle('active',!planner);
   document.getElementById('tabPlanner').classList.toggle('active',planner);
   document.getElementById('tabWork').classList.toggle('active',!planner);
-  if(!planner) renderWorkCalendar();
+  if(!planner) loadWorkLogs().then(renderWorkCalendar);
 }
 
 function getWorkMonthDate(){
@@ -657,13 +656,48 @@ function autoWorkForDate(ds){
 function manualWorkForDate(ds){ return Number(manualWork[ds])||0; }
 function totalWorkForDate(ds){ return autoWorkForDate(ds)+manualWorkForDate(ds); }
 
-function addManualWork(ds,inputId){
+async function loadWorkLogs(){
+  const {data,error}=await db.from('work_logs').select('work_date,chars');
+  if(error){
+    console.error(error);
+    alert('작업 기록을 불러오지 못했습니다: '+error.message);
+    return;
+  }
+  manualWork={};
+  (data||[]).forEach(row=>{ manualWork[row.work_date]=Number(row.chars)||0; });
+}
+
+async function saveWorkAdjustment(ds, adjustment){
+  const {error}=await db.from('work_logs').upsert(
+    {work_date:ds, chars:Math.trunc(adjustment)},
+    {onConflict:'work_date'}
+  );
+  if(error){
+    console.error(error);
+    alert('작업 글자수 저장에 실패했습니다: '+error.message);
+    return false;
+  }
+  manualWork[ds]=Math.trunc(adjustment);
+  return true;
+}
+
+async function setDailyTotal(ds,inputId){
   const input=document.getElementById(inputId);
-  const amount=Math.max(0,Number(input && input.value)||0);
-  if(!amount) return;
-  manualWork[ds]=manualWorkForDate(ds)+amount;
-  try { localStorage.setItem('commissionPlannerManualWorkV1',JSON.stringify(manualWork)); } catch(e) {}
-  renderWorkCalendar();
+  if(!input) return;
+  const raw=input.value.trim();
+  if(raw==='') return;
+  const wanted=Math.max(0,Math.trunc(Number(raw)||0));
+  const adjustment=wanted-autoWorkForDate(ds);
+  if(await saveWorkAdjustment(ds,adjustment)) renderWorkCalendar();
+}
+
+async function editDailyTotal(ds){
+  const current=totalWorkForDate(ds);
+  const raw=prompt('이 날짜의 총 작업 글자수를 입력해주세요.', String(current));
+  if(raw===null) return;
+  const wanted=Math.max(0,Math.trunc(Number(raw)||0));
+  const adjustment=wanted-autoWorkForDate(ds);
+  if(await saveWorkAdjustment(ds,adjustment)) renderWorkCalendar();
 }
 
 function renderWorkCalendar(){
@@ -684,10 +718,10 @@ function renderWorkCalendar(){
     const inputId='manualWork_'+ds.replaceAll('-','_');
     html+=`<div class="work-day ${inMonth?'':'other'} ${ds===today?'today':''}">
       <div class="work-day-num">${d.getDate()}</div>
-      <div class="work-auto">${fmt(total)}</div>
+      <div class="work-auto" onclick="editDailyTotal('${ds}')" title="클릭해서 총 글자수 수정" style="cursor:pointer">${fmt(total)}</div>
       <div class="work-manual">
-        <input id="${inputId}" type="number" min="0" step="100">
-        <button type="button" onclick="addManualWork('${ds}','${inputId}')">+</button>
+        <input id="${inputId}" type="number" min="0" step="100" value="${Math.max(0,total)}" aria-label="${ds} 총 작업 글자수">
+        <button type="button" onclick="setDailyTotal('${ds}','${inputId}')">✓</button>
       </div>
     </div>`;
   }
