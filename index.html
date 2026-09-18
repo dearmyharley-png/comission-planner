@@ -345,8 +345,11 @@ td:last-child{color:var(--g);font-weight:700}
 <body>
 <div id="lockScreen" class="lock-screen">
   <div class="lock-box">
+    <h2>Planner Login</h2>
+    <p>Supabase 계정으로 로그인해주세요.</p>
+    <input id="plannerEmail" type="email" placeholder="Email" autocomplete="username">
     <input id="plannerPassword" type="password" placeholder="Password" autocomplete="current-password">
-    <button type="button" id="unlockButton">들어가기</button>
+    <button type="button" id="unlockButton">로그인</button>
     <div id="lockError" class="lock-error"></div>
   </div>
 </div><div class="wrap">
@@ -453,37 +456,53 @@ td:last-child{color:var(--g);font-weight:700}
 <script>
 const SUPABASE_URL = "https://xpcsrbbyqtwipwxgswcc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ehrKJJd8GVnYnFQV7JIlwQ_KmBgaZDW";
-const PLANNER_PASSWORD = "1021";
+// Supabase Auth: 비밀번호를 HTML에 저장하지 않습니다.
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+function setLoginBusy(busy){
+  const button=document.getElementById('unlockButton');
+  if(button){ button.disabled=busy; button.textContent=busy?'로그인 중…':'로그인'; }
+}
 
+async function unlockPlanner(){
+  const email=(document.getElementById('plannerEmail')?.value||'').trim();
+  const password=document.getElementById('plannerPassword')?.value||'';
+  const errorEl=document.getElementById('lockError');
+  if(errorEl) errorEl.textContent='';
+  if(!email || !password){ if(errorEl) errorEl.textContent='이메일과 비밀번호를 입력해주세요.'; return; }
+  setLoginBusy(true);
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  setLoginBusy(false);
+  if(error){ if(errorEl) errorEl.textContent='로그인에 실패했습니다. 이메일/비밀번호를 확인해주세요.'; return; }
+  document.getElementById('lockScreen').style.display='none';
+  await loadItems();
+}
 
-const LOGIN_KEY = "commissionPlannerUnlockedV1";
+async function initAuth(){
+  const lock=document.getElementById('lockScreen');
+  const button=document.getElementById('unlockButton');
+  const email=document.getElementById('plannerEmail');
+  const password=document.getElementById('plannerPassword');
+  if(button) button.onclick=unlockPlanner;
+  [email,password].forEach(el=>{ if(el) el.onkeydown=e=>{ if(e.key==='Enter') unlockPlanner(); }; });
 
-function unlockPlanner(){
-  const input = document.getElementById("plannerPassword");
-  const error = document.getElementById("lockError");
-  if (input && input.value === "1021") {
-    try { localStorage.setItem(LOGIN_KEY, "yes"); } catch(e) {}
-    document.getElementById("lockScreen").style.display = "none";
-    if (error) error.textContent = "";
-  } else if (error) {
-    error.textContent = "비밀번호 오류.";
+  const { data:{ user } } = await db.auth.getUser();
+  if(user){
+    lock.style.display='none';
+    await loadItems();
+  }else{
+    lock.style.display='flex';
+    setTimeout(()=>email?.focus(),50);
   }
 }
 
-(function initLockImmediately(){
-  const lock = document.getElementById("lockScreen");
-  const input = document.getElementById("plannerPassword");
-  const button = document.getElementById("unlockButton");
-  try { if (localStorage.getItem(LOGIN_KEY) === "yes") lock.style.display = "none"; } catch(e) {}
-  if (button) button.onclick = unlockPlanner;
-  if (input) {
-    input.onkeydown = function(e){ if (e.key === "Enter") unlockPlanner(); };
-    setTimeout(function(){ input.focus(); }, 50);
+db.auth.onAuthStateChange((event, session)=>{
+  if(event==='SIGNED_OUT' || !session){
+    const lock=document.getElementById('lockScreen');
+    if(lock) lock.style.display='flex';
   }
-})();
+});
 
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let items = [];
 let weekOffset = 0;
 let workMonthOffset = 0;
@@ -772,5 +791,5 @@ document.getElementById('tbody').innerHTML=items
 }
 
 render();
-loadItems();
+initAuth();
 </script></body></html>
