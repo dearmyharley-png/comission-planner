@@ -475,6 +475,8 @@ async function unlockPlanner(){
   if(error){ if(errorEl) errorEl.textContent='로그인에 실패했습니다. 이메일/비밀번호를 확인해주세요.'; return; }
   document.getElementById('lockScreen').style.display='none';
   await loadItems();
+  await loadManualWork();
+  renderWorkCalendar();
 }
 
 async function initAuth(){
@@ -489,6 +491,8 @@ async function initAuth(){
   if(user){
     lock.style.display='none';
     await loadItems();
+    await loadManualWork();
+    renderWorkCalendar();
   }else{
     lock.style.display='flex';
     setTimeout(()=>email?.focus(),50);
@@ -506,7 +510,21 @@ let items = [];
 let weekOffset = 0;
 let workMonthOffset = 0;
 let manualWork = {};
-try { manualWork = JSON.parse(localStorage.getItem('commissionPlannerManualWorkV1') || '{}') || {}; } catch(e) { manualWork = {}; }
+
+async function loadManualWork(){
+  const { data, error } = await db
+    .from('daily_work')
+    .select('work_date,amount');
+  if(error){
+    console.error(error);
+    alert('날짜별 작업 기록을 불러오지 못했습니다: '+error.message);
+    return;
+  }
+  manualWork = {};
+  (data||[]).forEach(x=>{
+    manualWork[x.work_date] = Number(x.amount)||0;
+  });
+}
 
 const fmt=n=>(Number(n)||0).toLocaleString('ko-KR')+'자';
 function iso(d){let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)}
@@ -656,7 +674,7 @@ function autoWorkForDate(ds){
 function manualWorkForDate(ds){ return Number(manualWork[ds])||0; }
 function totalWorkForDate(ds){ return autoWorkForDate(ds)+manualWorkForDate(ds); }
 
-function setDailyWork(ds,inputId){
+async function setDailyWork(ds,inputId){
   const input=document.getElementById(inputId);
   if(!input) return;
 
@@ -665,10 +683,20 @@ function setDailyWork(ds,inputId){
   const amount=Number(String(input.value).replace(/,/g,''))||0;
   if(!amount){ input.value=''; return; }
 
-  manualWork[ds]=manualWorkForDate(ds)+amount;
-  if(manualWork[ds]===0) delete manualWork[ds];
+  const newAmount=manualWorkForDate(ds)+amount;
+  const { error } = await db
+    .from('daily_work')
+    .upsert({work_date:ds, amount:newAmount}, {onConflict:'work_date'});
 
-  try { localStorage.setItem('commissionPlannerManualWorkV1',JSON.stringify(manualWork)); } catch(e) {}
+  if(error){
+    console.error(error);
+    alert('날짜별 작업 기록 저장에 실패했습니다: '+error.message);
+    return;
+  }
+
+  if(newAmount===0) delete manualWork[ds];
+  else manualWork[ds]=newAmount;
+  input.value='';
   renderWorkCalendar();
 }
 
