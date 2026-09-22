@@ -799,9 +799,7 @@ document.getElementById('sRemain').textContent=fmt(Math.max(0,planned-worked));
   dates.forEach((d,idx)=>{
   let ds=iso(d),
       dues=items.filter(x=>x.status!=='완료'&&x.due===ds),
-      completed=weekOffset===0
-    ? items.filter(x=>x.status==='완료'&&x.due===ds)
-    : [],
+      completed=items.filter(x=>x.status==='완료'&&x.due===ds),
       pays=items.filter(x=>x.status!=='완료'&&x.pay===ds);
 
   let rem=Math.max(0,dues.reduce((a,x)=>a+x.chars-x.worked,0));
